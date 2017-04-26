@@ -81,13 +81,19 @@ export class ModalDirective implements AfterViewInit, OnDestroy {
   // todo: implement _dialog
   private _dialog: any;
 
-  @HostListener('click', ['$event'])
-  public onClick(event: any): void {
-    if (this.config.ignoreBackdropClick || this.config.backdrop === 'static' || event.target !== this._element.nativeElement) {
-      return;
-    }
+  private isMousedownOnBackdrop: boolean = false
 
-    this.hide(event);
+  @HostListener('mousedown', ['$event'])
+  public onMousedown(event: any): void {
+    this.isMousedownOnBackdrop = event.target === this._element.nativeElement
+  }
+
+  @HostListener('mouseup', ['$event'])
+  public onMouseup(event: any): void {
+    if (this.isMousedownOnBackdrop && !this.config.ignoreBackdropClick && this.config.backdrop !== 'static' && event.target === this._element.nativeElement) {
+      this.hide(event)
+    }
+    this.isMousedownOnBackdrop = false
   }
 
   // todo: consider preventing default and stopping propagation
